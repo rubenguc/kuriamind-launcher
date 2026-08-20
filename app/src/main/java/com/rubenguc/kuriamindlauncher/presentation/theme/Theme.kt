@@ -1,4 +1,4 @@
-package com.rubenguc.kuriamindlauncher.ui.theme
+package com.rubenguc.kuriamindlauncher.presentation.theme
 
 import android.app.Activity
 import android.os.Build

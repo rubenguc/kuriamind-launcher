@@ -8,9 +8,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +30,7 @@ import com.rubenguc.kuriamindlauncher.presentation.LauncherViewModel
 import com.rubenguc.kuriamindlauncher.presentation.drawer.AppDrawer
 import com.rubenguc.kuriamindlauncher.presentation.home.HomeScreen
 import com.rubenguc.kuriamindlauncher.presentation.theme.KuriaMindLauncherTheme
+import com.rubenguc.kuriamindlauncher.presentation.theme.ThemePreference
 
 class MainActivity : ComponentActivity() {
     lateinit var container: AppContainer
@@ -37,10 +41,14 @@ class MainActivity : ComponentActivity() {
         container = AppContainer(applicationContext)
 
         setContent {
-            KuriaMindLauncherTheme {
-                val launcherViewModel: LauncherViewModel = viewModel(
-                    factory = LauncherViewModel.Factory(container)
-                )
+            val launcherViewModel: LauncherViewModel = viewModel(
+                factory = LauncherViewModel.Factory(container)
+            )
+            val systemInDark = isSystemInDarkTheme()
+            val themePreference by launcherViewModel.themePreference.collectAsStateWithLifecycle()
+            val darkTheme = themePreference.isDark(systemInDark)
+
+            KuriaMindLauncherTheme(darkTheme = darkTheme) {
                 val apps by launcherViewModel.apps.collectAsStateWithLifecycle()
 
                 var isDrawerOpen by remember { mutableStateOf(false) }
@@ -61,32 +69,37 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                Box(modifier = Modifier.fillMaxSize()) {
-                    HomeScreen(
-                        apps = apps,
-                        onAppClick = launcherViewModel::launch,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .pointerInput(Unit) {
-                                detectVerticalDragGestures { _, dragAmount ->
-                                    if (dragAmount < -20f) {
-                                        isDrawerOpen = true
-                                    }
-                                }
-                            }
-                    )
-
-                    if (isDrawerOpen) {
-                        Box(
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        HomeScreen(
+                            apps = apps,
+                            onAppClick = launcherViewModel::launch,
                             modifier = Modifier
                                 .fillMaxSize()
-                                .offset(y = drawerOffsetY)
-                        ) {
-                            AppDrawer(
-                                apps = apps,
-                                onAppClick = launcherViewModel::launch,
-                                onClose = { isDrawerOpen = false }
-                            )
+                                .pointerInput(Unit) {
+                                    detectVerticalDragGestures { _, dragAmount ->
+                                        if (dragAmount < -20f) {
+                                            isDrawerOpen = true
+                                        }
+                                    }
+                                }
+                        )
+
+                        if (isDrawerOpen) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .offset(y = drawerOffsetY)
+                            ) {
+                                AppDrawer(
+                                    apps = apps,
+                                    onAppClick = launcherViewModel::launch,
+                                    onClose = { isDrawerOpen = false }
+                                )
+                            }
                         }
                     }
                 }

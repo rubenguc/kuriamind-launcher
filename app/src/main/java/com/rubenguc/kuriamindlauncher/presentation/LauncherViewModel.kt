@@ -9,6 +9,7 @@ import com.rubenguc.kuriamindlauncher.data.AppIconLoader
 import com.rubenguc.kuriamindlauncher.domain.usecase.GetInstalledApps
 import com.rubenguc.kuriamindlauncher.domain.usecase.LaunchApp
 import com.rubenguc.kuriamindlauncher.presentation.model.AppUiItem
+import com.rubenguc.kuriamindlauncher.presentation.theme.ThemePreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,6 +29,13 @@ class LauncherViewModel(
 
     private val _apps = MutableStateFlow<List<AppUiItem>>(emptyList())
     val apps: StateFlow<List<AppUiItem>> = _apps.asStateFlow()
+
+    private val _themePreference = MutableStateFlow(ThemePreference.SYSTEM)
+    val themePreference: StateFlow<ThemePreference> = _themePreference.asStateFlow()
+
+    fun setThemePreference(preference: ThemePreference) {
+        _themePreference.value = preference
+    }
 
     init {
         viewModelScope.launch {

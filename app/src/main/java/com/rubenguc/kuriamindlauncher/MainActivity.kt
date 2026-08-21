@@ -2,6 +2,7 @@ package com.rubenguc.kuriamindlauncher
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.animateDpAsState
@@ -53,6 +54,12 @@ class MainActivity : ComponentActivity() {
                     animationSpec = tween(durationMillis = 250),
                     label = "drawerSlide"
                 )
+
+                BackHandler {
+                    if (isDrawerOpen) {
+                        isDrawerOpen = false
+                    }
+                }
 
                 Box(modifier = Modifier.fillMaxSize()) {
                     HomeScreen(
